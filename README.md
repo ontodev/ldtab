@@ -20,9 +20,9 @@ This implementation uses Jena to parse input RDF graphs and supports SQLite and 
 
 The motivation for `ldtab` is threefold:
 
-1. facilitate work with large RDF graphs,
-2. simplify SPARQL queries for complex RDF structures involving blank nodes,
-3. enable text-based diffs between different versions of an RDF graph.
+1. facilitate work with *large RDF graphs*,
+2. *simplify SPARQL queries* for complex RDF structures involving blank nodes,
+3. enable text-based *diffs* between different versions of an RDF graph.
 
 The following provides more details and examples for each of these goals. 
 
@@ -81,7 +81,7 @@ WHERE {
   </tr>
 </table>
 
-### Complex Queries and OWL Support
+### 2. Simplify Complex Queries 
 
 Querying RDF data for an entity can be annoying and error-prone
 if the entities representation involves complex structures, such as compound OWL class expressions or OWL annotation axioms.
@@ -107,7 +107,7 @@ WHERE subject = "pizza:Pizza";</pre>
   </tr>
 </table>
 
-### Text-based Diffs between RDF Graphs
+### 3. Text-based Diffs between RDF Graphs
 
 An RDF graph can be serialized in many equivalent ways using one concrete syntax.
 Existing tools rarely serialize the same graph in a deterministic way.
