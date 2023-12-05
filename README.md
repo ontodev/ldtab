@@ -1,6 +1,6 @@
 # ldtab: Linked Data Tables
 
-`ldtab` reads RDF graph and generates a `statements` table like this:
+`ldtab` reads an RDF graph and generates a `statements` table like this:
 
 assertion | retraction | graph | subject     | predicate       | object   | datatype | annotation
 ----------|------------|-------|-------------|-----------------|----------|----------|------------
@@ -48,7 +48,7 @@ Consider the following examples:
   <tr>
     <td>Get subjects with labels</td>
     <td>
-      <pre lang="sql">SELECT subject, value AS label
+      <pre lang="sql">SELECT subject, object AS label
 FROM statements
 WHERE predicate = "rdfs:label";</pre>
     </td>
@@ -63,7 +63,7 @@ WHERE {
   <tr>
     <td>Get OWL classes with labels</td>
     <td>
-      <pre lang="sql">SELECT s1.subject, s2.value AS label
+      <pre lang="sql">SELECT s1.subject, s2.object AS label
 FROM statements s1
 JOIN statements s2 ON s2.subject = s1.subject
 WHERE s1.predicate = "rdf:type"
