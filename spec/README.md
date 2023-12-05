@@ -1,14 +1,14 @@
 # Design
 
-The design of `ldtab` is based on tables with the following structure:
+The design of `ldtab` is based on three tables with the following structure:
 
-- ldtab: metadata
+1. ldtab: metadata
     - key
     - value
-- prefix: used to convert between IRIs and CURIEs
+2. prefix: used to convert between IRIs and CURIEs
     - prefix: the short prefix string
     - base: its expansion
-- statement: used to store an RDF graph
+3. statement: used to store an RDF graph
     - assertion: an integer indicating when the statement was asserted
     - retraction: an integer indicating when the statement was retracted;
       defaults to 0, which means **no** retraction;
@@ -20,11 +20,13 @@ The design of `ldtab` is based on tables with the following structure:
     - datatype
     - annotation: for RDF reifications and OWL annotations
 
-In the following, we discuss these tables in more detail.
+In the following, we discuss these tables and their contents in more detail.
 
 ## LDTab Metadata
 
-Metadata typically consist of key–value pairs. Metadata that describe the contents of the RDF graph can me stored in the ldtab table. Such metadata can include the `ldtab` verison, relevant schemas for data validation, etc.
+Metadata typically consist of key–value pairs.
+Metadata that describe the contents of the RDF graph can me stored in the ldtab table.
+Such metadata can include the `ldtab` verison, relevant schemas for data validation, etc.
 
 ## Prefixes
 
@@ -47,9 +49,11 @@ Some warnings:
 If you've worked with RDF before,
 most of the columns in the statement tables should be familiar.
 
-The columns `assertion` and `retraction` are used to maintain the edit history of an RDF graph over time. This edit history can be used to create any version of the graph in its edit history. This approach is inspired by [Datomic](https://www.datomic.com/). We will explain how this works in more detail later.
+The columns `assertion` and `retraction` are used to maintain the edit history of an RDF graph over time.
+This edit history can be used to create any version of the graph in its edit history.
+This approach is inspired by [Datomic](https://www.datomic.com/). We will explain how this works in more detail later.
 
-The `graph` column is used for different graphs.
+The `graph` column is used to serialize multiple named graphs (see also [TriG](https://www.w3.org/TR/trig/)).
 
 Values in the columns `subject`, `predicate`, `object`, `datatype`, `annotation` are encoded pretty much as you would in Turtle syntax:
 
@@ -62,21 +66,21 @@ Some differences from Turtle syntax:
 
 - literals are multiline strings, without enclosing quotations marks or escaping,
 - blank nodes are skolemized using IRIs derived from a Hash of RDF structure it represents,
-- instead of [blankNodePropertyLists](https://www.w3.org/TR/turtle/#grammar-production-blankNodePropertyList) `ldtab` uses JSON objects as will be explained next.
+- instead of [blankNodePropertyLists](https://www.w3.org/TR/turtle/#grammar-production-blankNodePropertyList), `ldtab` uses JSON objects as will be explained next.
 
 ## Predicate Maps
 
-A *predicate map* is a JSON object essentially encoding a blankNodePropertyLists in Turtle.
-For example, an OWL existential restriciton in Turtle
+A *predicate map* is a JSON object encoding a [blankNodePropertyLists](https://www.w3.org/TR/turtle/#grammar-production-blankNodePropertyList) in Turtle.
+For example, an OWL existential restriction in Turtle
 
 ```ttl
-[ rdf:type owl:Restriction ;
-  owl:onProperty pizza:hasBase ;
-  owl:someValuesFrom pizzaBase
+[ owl:onProperty pizza:hasBase ;
+  owl:someValuesFrom pizza:PizzaBase ;
+  rdf:type owl:Restriction
 ]
 ```
 
-is encoded in `ldtab` as follows:
+is encoded in `ldtab` as
 
 ```json
 {
@@ -101,16 +105,24 @@ is encoded in `ldtab` as follows:
 }
 ```
 
-A [predicateObjectList](https://www.w3.org/TR/turtle/#grammar-production-predicateObjectList) in Turtle is encoded by a JSON array. We use such arrays even if there is only one object.
+A [predicateObjectList](https://www.w3.org/TR/turtle/#grammar-production-predicateObjectList) in Turtle is encoded by a JSON array.
+We use such arrays even if there is only one object.
 
 ## Objects
 
-We  encode *RDF objects* using two the columns `object` and `datatype`.
+We  encode *RDF objects* using the two columns `object` and `datatype`.
 RDF objects fall into three categories indicated by the `datatype` column:
 
-1. IRI: `datatype` is _IRI,
+1. IRI: `datatype` is `_IRI`,
 2. Literal: `datatype` is either a language tag or an a datatype IRI,
-3. Predicate Map: `datatype` is _JSON
+3. Predicate Map: `datatype` is `_JSON`
+
+Every `object` is required to have a `datatype`.
+So, [simple literals](https://www.w3.org/TR/rdf11-concepts/#section-Graph-Literal) (also referred to as [plain literals](https://www.w3.org/TR/rdf-plain-literal/)) are not supported by `ldtab`.
+A literal without a datatype is serialized with the datatype IRI [xsd:string](http://www.w3.org/2001/XMLSchema#string).
+
+The `datatype` of nested RDF objects is encoded with predicate maps (see the above example, e.g., for `owl:Restriction`).
+
 
 ## OWL Annotation Axioms
 
