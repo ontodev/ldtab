@@ -21,7 +21,7 @@ This implementation uses Jena to parse input RDF graphs and supports SQLite and 
 The motivation for `ldtab` is threefold:
 
 1. facilitate work with *large RDF graphs*,
-2. *simplify SPARQL queries* for complex RDF structures involving blank nodes,
+2. *simplify* certain SPARQL queries for complex RDF structures involving blank nodes,
 3. enable text-based *diffs* between different versions of an RDF graph.
 
 The following provides more details and examples for each of these goals. 
@@ -109,7 +109,9 @@ WHERE subject = "pizza:Pizza";</pre>
 
 ### 3. Text-based Diffs between RDF Graphs
 
-An RDF graph can be serialized in many equivalent ways using one concrete syntax.
-Existing tools rarely serialize the same graph in a deterministic way.
+An RDF graph can be serialized in many equivalent ways.
+Even for a given concrete syntax, the serialization of an RDF graph is not uniquely determined.
+In practice, existing tools rarely guarantee to output the exact same serialization (using a single concrete syntax) of a given RDF graph. 
 This makes tracking changes in RDF graphs (or OWL ontologies) using popular version control systems, e.g., git, challenging.
-`ldtab` provides support to serialize an RDF graph in a uniquely determined manner, enabling text-based diffs in version control systems.
+
+`ldtab` provides support to serialize an RDF graph in a uniquely determined manner, enabling text-based `diff`s in version control systems.
