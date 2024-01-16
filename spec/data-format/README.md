@@ -194,9 +194,9 @@ is encoded in `ldtab` as
 ]
 ```
 
-## OWL Annotation Axioms
+## OWL Annotation Axioms and RDF Reification Statements
 
-OWL Annotation Axioms provide a way to make statements about other statements in the RDF graph.
+OWL Annotation Axioms and RDF Reifications provide a way to make statements about other statements in the RDF graph.
 For example, we can add a comment on a label:
 
 ```ttl
@@ -216,3 +216,23 @@ So `ldtab` provides this information in the annotation column:
 assertion | retraction | graph | subject | predicate | object   | datatype   | annotation
 ----------|------------|-------|---------|-----------|----------|------------|------------
 1         | 0          | graph | ex:foo  | ex:label  | Foo      | xsd:string | {"rdf:comment":[{"object":"A silly label", "datatype":"xsd:string"}],"datatype":"_JSON","meta":"owl:Axiom"}
+
+We represent RDF Reifications in a similar manner. Consider, for example:
+
+```ttl
+ex:foo rdfs:label "Foo" .
+[ rdf:type rdf:Statement ;
+  rdf:subject ex:foo ;
+  rdf:predicate ex:label ;
+  rdf:object "Foo" ;
+  ex:accordingTo "Some Source"
+] .
+```
+
+Note the different key-value pairs "meta":"owl:Axiom" and "meta":"rdf:Statement" used for
+indicating OWL Annotations and RDF Reifications respectively:
+
+
+assertion | retraction | graph | subject | predicate | object   | datatype   | annotation
+----------|------------|-------|---------|-----------|----------|------------|------------
+1         | 0          | graph | ex:foo  | ex:label  | Foo      | xsd:string | {"ex:accordingTo":[{"object":"Some Source", "datatype":"xsd:string"}],"datatype":"_JSON","meta":"rdf:Statement"}
